@@ -4,11 +4,11 @@
 	"private": true,
 	"packageManager": "npm",
 	"dependencies": {
-		"@vinext/cloudflare": "latest",
+		"@vinext/cloudflare": "^0.2.1",
 		"react": "latest",
 		"react-dom": "latest",
 		"react-server-dom-webpack": "latest",
-		"vinext": "latest"
+		"vinext": "^1.2.1"
 	},
 	"devDependencies": {
 		"@cloudflare/vite-plugin": "beta",

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Inter } from 'next/font/google'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const inter = Inter({ subsets: ['latin'] })
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -43,7 +45,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.className}>
       <body>{children}</body>
     </html>
   );

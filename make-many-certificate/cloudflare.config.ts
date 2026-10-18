@@ -2,7 +2,7 @@ import { bindings, defineConfig, defineWorker } from "cf/config";
 
 export default defineConfig({
   worker: defineWorker({
-    name: "make-many-certificate",
+    name: "makemanycertificate",
     entrypoint: "vinext/server/fetch-handler",
     compatibilityDate: "2026-10-17",
     compatibilityFlags: ["nodejs_compat"],

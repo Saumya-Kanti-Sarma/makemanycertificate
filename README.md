@@ -1,8 +1,6 @@
 # Make Many Certificates
 ![Alt text](./public/mmc-png.png)
 
-
-
 [Open the certificate generator](https://makemycertificate.developer-saumyasarma.workers.dev/).
 
 Make personalized certificates in batches using a certificate image and a CSV

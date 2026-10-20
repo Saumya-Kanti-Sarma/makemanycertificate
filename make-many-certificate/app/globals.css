@@ -1,8 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: dark;
-  background: #080808;
+  background: #ffffff;
 }
 
 * {
@@ -48,6 +47,6 @@ input {
   }
 
   p {
-    @apply text-base leading-7 text-zinc-400;
+    @apply text-base leading-7;
   }
 }

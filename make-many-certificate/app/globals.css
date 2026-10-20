@@ -2,6 +2,9 @@
 
 :root {
   background: #ffffff;
+  --nav-height: 75px;
+  --body-height: calc(100vh - 76px);
+  /* one pixel extra as havbar has hr tag under it*/
 }
 
 * {

@@ -6,6 +6,7 @@
 	"dependencies": {
 		"@vinext/cloudflare": "^0.2.1",
 		"jszip": "^3.10.2",
+		"papaparse": "^5.7.0",
 		"react": "latest",
 		"react-dom": "latest",
 		"react-icons": "^5.7.0",
@@ -16,6 +17,7 @@
 		"@cloudflare/vite-plugin": "beta",
 		"@tailwindcss/postcss": "latest",
 		"@types/node": "latest",
+		"@types/papaparse": "^5.5.2",
 		"@types/react": "latest",
 		"@types/react-dom": "latest",
 		"@vitejs/plugin-react": "latest",

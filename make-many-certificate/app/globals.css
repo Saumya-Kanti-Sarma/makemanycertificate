@@ -4,6 +4,10 @@
   background: #ffffff;
   --nav-height: 75px;
   --body-height: calc(100vh - 76px);
+  --bg: #fff4df;
+  --primary: #141414;
+  --text: #000000;
+  --text-gray: #4a5565;
   /* one pixel extra as havbar has hr tag under it*/
 }
 

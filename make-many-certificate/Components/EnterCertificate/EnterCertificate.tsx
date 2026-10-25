@@ -25,7 +25,22 @@ export default function EnterCertificate({ onCertificateChange }: EnterCertifica
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
+    <div className="flex flex-col min-h-[calc(100vh-4rem)] items-center justify-center px-4">
+
+      <img
+        src="/multy-certy/black-logo.svg"
+        alt="multy-certy logo"
+        className="mb-8 h-26 w-auto"
+      />
+
+      <h1 className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        <span>Welcome to</span>
+        <img src="/cursive.svg" alt="Make Many" className="h-10 w-auto sm:h-12" />
+      </h1>
+
+      <p className="mt-4 mb-5 max-w-lg text-center text-base leading-relaxed text-(--text-gray) sm:text-lg">
+        Generate certificates, report cards, IDs, and more in bulk for <b>FREE!</b>
+      </p>
       <div className="w-full max-w-md">
         {/* Hidden native input */}
         <input
@@ -49,8 +64,8 @@ export default function EnterCertificate({ onCertificateChange }: EnterCertifica
           <GoUpload className="h-10 w-10 text-gray-400 transition-colors group-hover:text-gray-500" />
 
           <div>
-            <p className="text-sm font-medium text-gray-700">Click to upload your certificate</p>
-            <p className="mt-1 text-xs text-[#c91111]">PNG or JPG </p>
+            <p className="text-sm font-medium text-(--text-gray)">Click to upload your certificate</p>
+            <p className="mt-1 text-xs text-(--text-gray)"> <b>PNG or JPG</b> </p>
           </div>
         </label>
       </div>

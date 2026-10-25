@@ -1,98 +1,146 @@
 import { useRef, useState } from "react";
-import Papa from "papaparse";
+import type { CsvResult, Notice } from "./types";
+import Table from "./local/Table";
+import { handleCellChange, handleDelete, handleInputChange } from "./utils/utils";
 
-interface SideBarInterface {
-  handleChange?: () => void;
-}
 
-type CsvResult =
-  | { ok: true; headers: string[]; rows: Record<string, string[]> }
-  | { ok: false; error: Error };
-
-export default function Sidebar({ handleChange }: SideBarInterface) {
-  const _inputRef = useRef<HTMLInputElement>(null);
+export default function Sidebar() {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [csvData, setCSVData] = useState<CsvResult | null>(null);
+  const [isTableOpen, setIsTableOpen] = useState(false);
+  const [notice, setNotice] = useState<Notice | null>(null);
 
-  const _handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const rowCount = csvData?.ok
+    ? Math.max(
+      0,
+      ...csvData.headers.map((header) => csvData.rows[header]?.length ?? 0)
+    )
+    : 0;
 
-    Papa.parse<Record<string, string>>(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        const headers = results.meta.fields ?? [];
-        const rows = Object.fromEntries(
-          headers.map((col) => [col, results.data.map((row) => row[col])])
-        );
-        setCSVData({ ok: true, headers, rows });
-        handleChange?.();
-      },
-      error: (err) => setCSVData({ ok: false, error: err }),
-    });
 
-    // allow re-selecting the same file
-    event.target.value = "";
-  };
 
   return (
-    <aside className="flex w-64 shrink-0 flex-col gap-4 border-r border-amber-300 bg-amber-50 p-4">
-      <header className="flex items-start justify-start">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-amber-900">
-          CSV Data
-        </h2>
-        {csvData?.ok && (
-          <span className="px-2 py-0.5 text-xs font-medium ">
-            {csvData.headers.length} cols
-          </span>
+    <aside className="flex h-full w-64 shrink-0 flex-col border-r border-black/10 bg-white text-black">
+
+
+      {/* Upload section */}
+      <div className="space-y-3 p-4">
+        {!csvData?.ok ? (
+          <label
+            htmlFor="csv-data"
+            className="group flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-black/20 bg-white px-4 py-6 text-center transition-all hover:border-black/50 hover:bg-black/2 focus-within:ring-2 focus-within:ring-black"
+          >
+            <span className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-black/10 bg-black/3 transition-colors group-hover:bg-black/6">
+              <img src="/icons/upload.svg" alt="upload-svg" className="h-5 w-5" />
+
+            </span>
+
+            <span className="text-sm font-medium">
+              Upload a CSV file
+            </span>
+            <span className="mt-3 text-[10px] font-bold uppercase tracking-wider text-[#d32323]">
+              CSV · Max 5 MB
+            </span>
+            <input
+              ref={inputRef}
+              type="file"
+              name="csv-data"
+              id="csv-data"
+              accept=".csv,text/csv"
+              onChange={(event) => {
+                handleInputChange(
+                  event, setCSVData, setNotice, setIsTableOpen
+                )
+              }}
+              className="sr-only"
+            />
+          </label>
+        ) : (
+          <div className="rounded-xl border border-black/10 p-3">
+            <div className="flex items-start gap-3">
+
+              <div className="min-w-0 flex-1">
+                <p className="mt-1 text-xs text-black/45">
+                  Total: {rowCount} {rowCount > 1 ? "rows" : "row"} and {csvData.headers.length} {csvData.headers.length > 1 ? "columns" : "comumn"}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setIsTableOpen(true)}
+                className="rounded-lg border border-black/15 bg-white px-3 py-2 text-xs font-medium text-black transition-colors hover:bg-[#d8d8d8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+              >
+                View
+              </button>
+
+              <button
+                type="button"
+                onClick={() => (handleDelete(
+                  setCSVData,
+                  setNotice,
+                  setIsTableOpen,
+                  inputRef
+                ))}
+                className="rounded-lg border border-black/15 px-3 py-2 text-xs font-medium text-black/70 transition-colors hover:border-red-300 hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         )}
-      </header>
 
-      {/* Upload button - Added grapy hover state */}
-      <label
-        htmlFor="csv-data"
-        className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed  bg-white px-3 py-2 text-sm font-medium text-black transition-colors duration-200 opacity-50 hover:opacity-100 "
-      >
-        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-          <path d="M12 16V4m0 0L8 8m4-4 4 4M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
-        </svg>
-        Upload CSV
-      </label>
-      <input
-        type="file"
-        name="csv-data"
-        id="csv-data"
-        accept=".csv,text/csv"
-        ref={_inputRef}
-        onChange={_handleInputChange}
-        className="sr-only"
-      />
-      {/* Error state */}
-      {csvData && !csvData.ok && (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-xs text-red-700 ring-1 ring-red-200">
-          {csvData.error.message}
-        </p>
-      )}
+        {/* Success, warning and error messages */}
+        {notice && notice.type != "success" && (
+          <div
+            role={"alert"}
+            className="flex items- justify-center gap-2 rounded-lg border p-3 text-xs leading-5 border-red-200 bg-red-50 text-red-700"
+          >
+            <p className="min-w-0 wrap-break-words">{notice.message}</p>
+          </div>
+        )}
+      </div>
 
-      {/* Empty state */}
-      {!csvData && (
-        <p className="text-xs text-amber-700/70">
-          No file loaded yet. Choose a CSV to see its columns.
-        </p>
-      )}
+      {/* Column list */}
+      <div className="border-t border-black/10 px-4 py-4">
+        <h3 className="mb-3 text-xs font-semibold text-black/70">
+          All Columns
+        </h3>
 
-      {/* Column list - Added grapy hover state */}
-      {csvData?.ok && (
-        <div className="flex flex-wrap gap-1.5">
-          {csvData.headers.map((header) => (
-            <button
-              key={header}
-              className="inline-flex cursor-pointer items-center rounded-[10px] border border-gray-200 bg-white px-3 py-1 text-sm font-medium text-gray-800 transition-colors duration-200 opacity-50 hover:opacity-100 focus:outline-none "
-            >
-              {header}
-            </button>
-          ))}
-        </div>
+        {!csvData?.ok ? (
+          <div className="rounded-lg border border-black/10 bg-black/2 px-3 py-4 text-center">
+            <p className="text-xs font-medium text-black/60">
+              No columns yet
+            </p>
+            <p className="mt-1 text-[11px] leading-5 text-black/40">
+              Upload a CSV to see its column names here.
+            </p>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-1.5">
+            {csvData.headers.map((header) => (
+              <span
+                key={header}
+                title={header}
+                className="max-w-full truncate rounded-md border border-black/10 bg-white px-2.5 py-1.5 text-xs font-medium text-black/75 transition-colors hover:border-black/30 hover:bg-black/3"
+              >
+                {header}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {isTableOpen && csvData?.ok && (
+        <Table
+          csvData={csvData}
+          rowCount={rowCount}
+          onCellChange={(header, rowIndex, value) =>
+            handleCellChange(header, rowIndex, value, setCSVData)
+          }
+          onClose={() => setIsTableOpen(false)}
+        />
       )}
     </aside>
   );

@@ -3,9 +3,9 @@ import EnterCertificate from "@/Components/EnterCertificate/EnterCertificate";
 import Navbar from "@/Components/Navbar/Navbar";
 import { useRef, useState } from "react";
 import { CertificateInterface } from "@/types/types";
-import Sidebar, { type TextField } from "@/Components/Sidebar/Sidebar";
+import Sidebar from "@/Components/Sidebar/Sidebar";
 import CertificateEditor from "@/Components/CertificateEditor/CertificateEditor";
-import type { CsvResult } from "@/Components/Sidebar/types";
+import type { CsvResult, _type_TextField } from "@/types/types";
 
 export default function GenerateCertificate() {
   const [certificate, setCertificate] = useState<CertificateInterface | null>(null);
@@ -13,7 +13,7 @@ export default function GenerateCertificate() {
 
   // The ONLY place where fields and selectedId live.
   // Sidebar and CertificateEditor both receive them through props.
-  const [fields, setFields] = useState<TextField[]>([]);
+  const [fields, setFields] = useState<_type_TextField[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const imgRef = useRef<HTMLImageElement | null>(null);

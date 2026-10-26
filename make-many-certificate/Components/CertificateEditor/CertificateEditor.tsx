@@ -1,7 +1,7 @@
 "use client";
 import React, { useCallback, useEffect, useRef } from "react";
 import { CertificateInterface } from "@/types/types";
-import { CsvResult } from "@/Components/Sidebar/types";
+import { CsvResult } from "@/types/types";
 import type { TextField } from "@/Components/Sidebar/Sidebar";
 
 interface Props {

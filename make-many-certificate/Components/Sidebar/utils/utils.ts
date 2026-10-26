@@ -1,5 +1,5 @@
 import { ChangeEvent, RefObject, SetStateAction } from "react";
-import { CsvResult, Notice } from "../types";
+import { CsvResult, Notice } from "@/types/types";
 import { MAX_FILE_SIZE } from "../constants";
 import Papa from "papaparse"; // the parses that parses csv into objects.
 

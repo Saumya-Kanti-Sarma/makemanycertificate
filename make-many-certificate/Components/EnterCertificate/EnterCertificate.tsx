@@ -1,3 +1,8 @@
+/* 
+For Future Saumya:
+This is the 1st screen that is visible on the website launch. 
+When a user selects an image (jpg or png) then ths component becomes invisible and the <CertificateEditor/> component take in action. 
+*/
 import React, { useRef } from "react";
 import { GoUpload } from "react-icons/go";
 import { CertificateInterface } from "@/types/types";

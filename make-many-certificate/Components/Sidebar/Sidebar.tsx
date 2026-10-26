@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import JSZip from "jszip";
-import type { CsvResult, Notice } from "./types";
-import type { CertificateInterface } from "@/types/types";
+import type { CertificateInterface, CsvResult, Notice } from "@/types/types";
 import Table from "./local/Table";
 import { handleCellChange, handleDelete, handleInputChange } from "./utils/utils";
 

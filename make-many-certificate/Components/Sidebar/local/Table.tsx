@@ -1,4 +1,4 @@
-import type { CsvResult } from "../types";
+import type { CsvResult } from "@/types/types";
 
 interface TableProps {
   csvData: Extract<CsvResult, { ok: true }>;

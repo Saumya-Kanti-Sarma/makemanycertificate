@@ -39,6 +39,7 @@ export default function GenerateCertificate() {
           imgRef={imgRef}
         />
         <CertificateEditor
+          show_prev_next_navigation={csvData ? true : false}
           certificate={certificate}
           csvData={csvData}
           fields={fields}

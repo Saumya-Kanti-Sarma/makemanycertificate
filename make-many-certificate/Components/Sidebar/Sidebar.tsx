@@ -17,6 +17,7 @@ export interface TextField {
   fontFamily: string;
   bold: boolean;
   italic: boolean;
+  underline: boolean;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -28,34 +29,44 @@ function uid() {
 const FONT_FAMILIES = ["Inter", "Arial", "Georgia", "Courier New", "Times New Roman"];
 
 // ─── Props ────────────────────────────────────────────────────────────────────
+// fields and selectedId are owned by the PAGE. The sidebar only reads them
+// and asks the page to change them.
 
 interface SidebarProps {
   certificate: CertificateInterface | null;
-  onFieldsChange: (fields: TextField[]) => void;
+  fields: TextField[];
+  setFields: React.Dispatch<React.SetStateAction<TextField[]>>;
+  selectedId: string | null;
+  setSelectedId: (id: string | null) => void;
   onCsvDataChange: (data: CsvResult | null) => void;
   imgRef: React.RefObject<HTMLImageElement | null>;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export default function Sidebar({ certificate, onFieldsChange, onCsvDataChange, imgRef }: SidebarProps) {
+export default function Sidebar({
+  certificate,
+  fields,
+  setFields,
+  selectedId,
+  setSelectedId,
+  onCsvDataChange,
+  imgRef,
+}: SidebarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [csvData, setCSVData] = useState<CsvResult | null>(null);
   const [isTableOpen, setIsTableOpen] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
-  const [fields, setFields] = useState<TextField[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
 
   // ── CSV state helpers ──────────────────────────────────────────────────────
+  // Update local state, then tell the parent (outside the updater function).
 
   const setCSVDataWithCallback = (value: React.SetStateAction<CsvResult | null>) => {
-    setCSVData((prev) => {
-      const next = typeof value === "function" ? value(prev) : value;
-      onCsvDataChange(next);
-      return next;
-    });
+    const next = typeof value === "function" ? value(csvData) : value;
+    setCSVData(next);
+    onCsvDataChange(next);
   };
 
   const rowCount = csvData?.ok
@@ -63,11 +74,8 @@ export default function Sidebar({ certificate, onFieldsChange, onCsvDataChange, 
     : 0;
 
   // ── Field helpers ──────────────────────────────────────────────────────────
-
-  const updateFields = (next: TextField[]) => {
-    setFields(next);
-    onFieldsChange(next);
-  };
+  // Functional updates (prev => ...) always start from the LATEST fields,
+  // including positions that were just dragged on the canvas.
 
   function addField(column: string) {
     const newField: TextField = {
@@ -80,20 +88,20 @@ export default function Sidebar({ certificate, onFieldsChange, onCsvDataChange, 
       fontFamily: "Inter",
       bold: false,
       italic: false,
+      underline: false,
     };
-    const next = [...fields, newField];
-    updateFields(next);
+    setFields((prev) => [...prev, newField]);
     setSelectedId(newField.id);
   }
 
   function updateSelected(patch: Partial<TextField>) {
-    const next = fields.map((f) => (f.id === selectedId ? { ...f, ...patch } : f));
-    updateFields(next);
+    setFields((prev) =>
+      prev.map((f) => (f.id === selectedId ? { ...f, ...patch } : f))
+    );
   }
 
   function removeField(id: string) {
-    const next = fields.filter((f) => f.id !== id);
-    updateFields(next);
+    setFields((prev) => prev.filter((f) => f.id !== id));
     if (selectedId === id) setSelectedId(null);
   }
 
@@ -135,13 +143,16 @@ export default function Sidebar({ certificate, onFieldsChange, onCsvDataChange, 
       }
 
       const firstVal = rowValues[fields[0]?.column] ?? `certificate_${i + 1}`;
-      const safeName = firstVal.replace(/[^a-z0-9_\-]/gi, "_").slice(0, 60) || `certificate_${i + 1}`;
+      const safeName =
+        firstVal.replace(/[^a-z0-9_\-]/gi, "_").slice(0, 60) || `certificate_${i + 1}`;
 
       const blob = await new Promise<Blob>((resolve) => {
         offscreen.toBlob((b) => resolve(b!), mimeType, 0.95);
       });
 
-      zip.file(`${safeName}.${ext}`, blob);
+      // Prefix with the row number so two people with the same name
+      // don't overwrite each other inside the zip.
+      zip.file(`${String(i + 1).padStart(3, "0")}_${safeName}.${ext}`, blob);
       setProgress(Math.round(((i + 1) / rowCount) * 100));
 
       if (i % 10 === 0) await new Promise((r) => setTimeout(r, 0));
@@ -366,7 +377,7 @@ export default function Sidebar({ certificate, onFieldsChange, onCsvDataChange, 
           </div>
 
           <button
-            onClick={() => removeField(selectedId!)}
+            onClick={() => removeField(selected.id)}
             className="w-full rounded-lg border border-red-200 bg-red-50 py-1.5 text-xs font-medium text-red-600 hover:bg-red-100 transition-colors"
           >
             Remove field

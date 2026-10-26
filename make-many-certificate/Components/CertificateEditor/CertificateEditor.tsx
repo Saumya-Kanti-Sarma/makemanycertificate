@@ -48,17 +48,6 @@ export default function CertificateEditor({
   const previewRef = useRef<HTMLCanvasElement>(null);
   const draggingRef = useRef<{ id: string; ox: number; oy: number } | null>(null);
 
-  // ── Load image ────────────────────────────────────────────────────────────
-  useEffect(() => {
-    const img = new Image();
-    img.src = certificate.url;
-    img.onload = () => {
-      imgRef.current = img;
-      redraw(fields);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [certificate.url]);
-
   // ── Redraw canvas ─────────────────────────────────────────────────────────
   const redraw = useCallback(
     (currentFields: TextField[], img: HTMLImageElement | null = imgRef.current) => {
@@ -101,9 +90,26 @@ export default function CertificateEditor({
         ctx.strokeRect(px - 2, py - 2, tw + 4, th + 4);
       }
     },
-    [csvData, selectedId]
+    [csvData, selectedId, imgRef]
   );
 
+  // ── Load image ────────────────────────────────────────────────────────────
+  // fieldsRef always holds the latest fields, so the onload callback never
+  // draws with an old copy.
+  const fieldsRef = useRef(fields);
+  fieldsRef.current = fields;
+
+  useEffect(() => {
+    const img = new Image();
+    img.src = certificate.url;
+    img.onload = () => {
+      imgRef.current = img;
+      redraw(fieldsRef.current, img);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [certificate.url]);
+
+  // Redraw whenever fields, selection or CSV data change
   useEffect(() => {
     redraw(fields);
   }, [fields, selectedId, redraw]);
@@ -114,8 +120,8 @@ export default function CertificateEditor({
     const canvas = previewRef.current!;
     const rect = canvas.getBoundingClientRect();
     return {
-      nx: ((e.clientX - rect.left) * canvas.width) / rect.width / canvas.width,
-      ny: ((e.clientY - rect.top) * canvas.height) / rect.height / canvas.height,
+      nx: (e.clientX - rect.left) / rect.width,
+      ny: (e.clientY - rect.top) / rect.height,
     };
   }
 
@@ -163,7 +169,15 @@ export default function CertificateEditor({
   }
 
   return (
-    <div className="relative flex flex-1 items-center justify-center overflow-auto bg-gray-100 p-6">
+    <div className="relative flex flex-1 items-center justify-center overflow-auto bg-gray-100 p-6 ">
+      <div>
+        <button
+          onClick={() => window.location.reload()}
+          className="absolute left-0 top-0 bg-white m-1 p-2 rounded-sm cursor-pointer text-(--text-gray) transition-all duration-100 ease-in hover:scale-105 hover:text-black"
+        >
+          Re-select
+        </button>
+      </div>
       <canvas
         ref={previewRef}
         className="max-h-full max-w-full cursor-crosshair shadow-xl"
@@ -172,11 +186,6 @@ export default function CertificateEditor({
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseUp}
       />
-      {fields.length === 0 && (
-        <p className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-black/40">
-          Click a column in the sidebar to place text on the certificate.
-        </p>
-      )}
     </div>
   );
 }

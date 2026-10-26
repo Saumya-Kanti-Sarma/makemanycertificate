@@ -713,7 +713,7 @@ export default function Sidebar({
 
       {showPasteModal && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]"
+          className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 p-4 backdrop-blur-[2px]"
           onClick={() => setShowPasteModal(false)}
         >
           <div

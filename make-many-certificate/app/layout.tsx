@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     siteName: "Multy Certy",
     images: [
       {
-        url: "/multy-certy/og-image.jpg",
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "Multy Certy",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Multy Certy",
     description: "Generate professional certificates in bulk with ease.",
-    images: ["/multy-certy/og-image.jpg"],
+    images: ["/og-image.jpg"],
   },
 };
 
